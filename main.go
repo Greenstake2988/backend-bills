@@ -37,7 +37,7 @@ func main() {
 	r.GET("/bills/:id", getBillHandler)
 	r.DELETE("/bills/:id", deleteBillHandler)
 
-	r.Run(":8502")
+	r.Run(":8080")
 }
 
 func getBillHandler(c *gin.Context) {
