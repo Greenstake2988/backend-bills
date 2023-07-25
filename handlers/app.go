@@ -2,10 +2,10 @@ package handlers
 
 import (
 	// data base sqlite3
-	//"gorm.io/driver/sqlite"
-	"fmt"
+	"gorm.io/driver/sqlite"
+	//"fmt"
 
-	"gorm.io/driver/postgres"
+	//"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -26,10 +26,10 @@ func (app *App) ConnectDB() {
 
 	var err error
 	//Conexion sqlite3
-	//app.DB, err = gorm.Open(sqlite.Open("bills.sqlite"), &gorm.Config{})
-
-	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", DBHost, DBPort, DBUser, DBPassword, DBName)
-	app.DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	app.DB, err = gorm.Open(sqlite.Open("bills.sqlite"), &gorm.Config{})
+	//conexion postgresql
+	//dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", DBHost, DBPort, DBUser, DBPassword, DBName)
+	//app.DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
 		panic("error al conectar ala base de datos")

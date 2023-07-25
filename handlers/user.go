@@ -12,7 +12,7 @@ type User struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
-	Bills    []Bill `json:"bills" gorm:"OnDelete:CASCADE"`
+	Bills    []Bill `json:"bills" gorm:"constraint:OnDelete:CASCADE"`
 }
 
 // Rutas Users
@@ -87,8 +87,9 @@ func (app *App) DeleteUserHandler(c *gin.Context) {
 		return
 	}
 
-	// delete the user and bills associated
-	if err := app.DB.Select("Bill").Delete(&user).Error; err != nil {
+	// borramos user y bills asociados
+	// unscoped para poder borrar definitivo
+	if err := app.DB.Unscoped().Delete(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete User"})
 		return
 	}
