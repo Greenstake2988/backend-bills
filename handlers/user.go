@@ -28,7 +28,7 @@ func (app *App) GetUserHandler(c *gin.Context) {
 	}
 
 	// find the first value in the data base with userID
-	if err := app.DB.First(&user, userID).Error; err != nil {
+	if err := app.DB.Preload("Bills").First(&user, userID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}

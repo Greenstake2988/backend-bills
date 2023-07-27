@@ -32,5 +32,8 @@ func main() {
 	r.GET("/users/:id", app.GetUserHandler)
 	r.DELETE("/users/:id", app.DeleteUserHandler)
 
+	// routes Login
+	r.POST("/login", app.loginUser)
+
 	r.Run(":8502")
 }
