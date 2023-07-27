@@ -20,6 +20,12 @@ func main() {
 	config.AllowAllOrigins = true
 	r.Use(cors.New(config))
 
+	// routes Login
+	r.POST("/login", app.LoginUser)
+
+	// Agregando el middleware
+	r.Use(app.AuthMiddleware)
+
 	// routes Bills
 	r.GET("/bills", app.BillsHandler)
 	r.POST("/bills", app.NewBillHandler)
@@ -31,9 +37,6 @@ func main() {
 	r.POST("/users", app.NewUserHandler)
 	r.GET("/users/:id", app.GetUserHandler)
 	r.DELETE("/users/:id", app.DeleteUserHandler)
-
-	// routes Login
-	r.POST("/login", app.loginUser)
 
 	r.Run(":8502")
 }

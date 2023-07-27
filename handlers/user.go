@@ -9,9 +9,8 @@ import (
 
 type User struct {
 	gorm.Model
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `json:"email" binding:"required" gorm:"unique"`
+	Password string `json:"password" binding:"required"`
 	Bills    []Bill `json:"bills" gorm:"constraint:OnDelete:CASCADE"`
 }
 
@@ -58,9 +57,15 @@ func (app *App) NewUserHandler(c *gin.Context) {
 		return
 	}
 
+	// Verificar si el correo electrónico ya existe en la base de datos
+	var existingUser User
+	if err := app.DB.Where("email = ?", newUser.Email).First(&existingUser).Error; err == nil {
+		// Correo electrónico ya existente, devolver mensaje de error en formato JSON
+		c.JSON(http.StatusBadRequest, gin.H{"error": "The Email already exist please use another."})
+		return
+	}
 	// Aqui guardaremos en la base de datos
 	if err := app.DB.Create(&newUser).Error; err != nil {
-		//Verificamos si se cumple alguna otra condicion
 
 		// Si no es un error de clave externa, devolver otro mensaje de error genérico
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create User"})
@@ -68,7 +73,7 @@ func (app *App) NewUserHandler(c *gin.Context) {
 	}
 
 	// Respond with a success message
-	c.JSON(http.StatusOK, gin.H{"message": "Received JSON", "data": newUser.Name})
+	c.JSON(http.StatusOK, gin.H{"message": "Received JSON", "data": newUser.Email})
 }
 func (app *App) DeleteUserHandler(c *gin.Context) {
 	var user User
