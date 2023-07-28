@@ -16,7 +16,7 @@ type Bill struct {
 }
 
 // Rutas Bills
-func (app *App) GetBillHandler(c *gin.Context) {
+func (h *Handler) GetBillHandler(c *gin.Context) {
 	var bill Bill
 
 	billID := c.Param("id")
@@ -28,17 +28,17 @@ func (app *App) GetBillHandler(c *gin.Context) {
 	}
 
 	// find the first value in the data base with billID
-	if err := app.DB.First(&bill, billID).Error; err != nil {
+	if err := h.DB.First(&bill, billID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Bill not found"})
 		return
 	}
 
 	c.JSON(http.StatusOK, bill)
 }
-func (app *App) BillsHandler(c *gin.Context) {
+func (h *Handler) BillsHandler(c *gin.Context) {
 	// fecthar los datos de la base de datos
 	var bills []Bill
-	app.DB.Find(&bills)
+	h.DB.Find(&bills)
 
 	// Set the "Access-Control-Allow-Origin" header to allow all origins (*)
 	c.Header("Access-Control-Allow-Origin", "*")
@@ -47,7 +47,7 @@ func (app *App) BillsHandler(c *gin.Context) {
 		"bills": bills,
 	})
 }
-func (app *App) NewBillHandler(c *gin.Context) {
+func (h *Handler) NewBillHandler(c *gin.Context) {
 	var newBill Bill
 
 	// Convierte el Json en el tipo de objeto que necesitamos
@@ -57,7 +57,7 @@ func (app *App) NewBillHandler(c *gin.Context) {
 	}
 
 	// Aqui guardaremos en la base de datos
-	if err := app.DB.Create(&newBill).Error; err != nil {
+	if err := h.DB.Create(&newBill).Error; err != nil {
 		//Verificamos si se cumple alguna otra condicion
 		if isForeignKeyConstraintError(err) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Foreign key constraint failed"})
@@ -71,7 +71,7 @@ func (app *App) NewBillHandler(c *gin.Context) {
 	// Respond with a success message
 	c.JSON(http.StatusOK, gin.H{"message": "Received JSON", "data": newBill.Concept})
 }
-func (app *App) DeleteBillHandler(c *gin.Context) {
+func (h *Handler) DeleteBillHandler(c *gin.Context) {
 	var bill Bill
 
 	billID := c.Param("id")
@@ -83,13 +83,13 @@ func (app *App) DeleteBillHandler(c *gin.Context) {
 	}
 
 	// find the first value in the data base with billID
-	if err := app.DB.First(&bill, billID).Error; err != nil {
+	if err := h.DB.First(&bill, billID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Bill not found"})
 		return
 	}
 
 	// delete the bill is found
-	if err := app.DB.Delete(&bill).Error; err != nil {
+	if err := h.DB.Delete(&bill).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete Bill"})
 		return
 	}

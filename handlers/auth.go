@@ -1,13 +1,15 @@
 package handlers
 
 import (
-	"github.com/gin-gonic/gin"
+	"net/http"
 
+	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
-// Rutas Login
-func (app *App) LoginUser(c *gin.Context) {
+// Rutas Auth
+func (h *Handler) LoginHandler(c *gin.Context) {
 
 	// struct only use for this handler
 	// credentials
@@ -24,7 +26,7 @@ func (app *App) LoginUser(c *gin.Context) {
 
 	// Chek if teh credentials exist and mount the bills into the user
 	var user User
-	err := app.DB.Where("email = ? AND password = ?", loginData.Email, loginData.Password).Preload("Bills").First(&user).Error
+	err := h.DB.Where("email = ?", loginData.Email).Preload("Bills").First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			// User not found
@@ -34,6 +36,16 @@ func (app *App) LoginUser(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "Internal server error"})
 	}
 
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginData.Password))
+	if err != nil {
+
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Credentials not valid"})
+	}
+
 	// Devolvemos el token
 	c.JSON(200, &user)
+}
+
+func (h *Handler) RegisterHandler(c *gin.Context) {
+	h.NewUserHandler(c)
 }

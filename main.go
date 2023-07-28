@@ -13,27 +13,28 @@ func main() {
 	r := gin.Default()
 
 	// Conexion ala base de datos
-	app := &handlers.App{}
-	app.ConnectDB()
+	h := &handlers.Handler{}
+	h.ConnectDB()
 	// Enable CORS middleware with permissive configuration
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
 	r.Use(cors.New(config))
 
-	// routes Login
-	r.POST("/login", app.LoginUser)
+	// routes Auth
+	r.POST("/login", h.LoginHandler)
+	r.POST("/register", h.RegisterHandler)
 
 	// routes Bills
-	r.GET("/bills", app.BillsHandler)
-	r.POST("/bills", app.NewBillHandler)
-	r.GET("/bills/:id", app.GetBillHandler)
-	r.DELETE("/bills/:id", app.DeleteBillHandler)
+	r.GET("/bills", h.BillsHandler)
+	r.POST("/bills", h.NewBillHandler)
+	r.GET("/bills/:id", h.GetBillHandler)
+	r.DELETE("/bills/:id", h.DeleteBillHandler)
 
 	// routes Users
-	r.GET("/users", app.UsersHandler)
-	r.POST("/users", app.NewUserHandler)
-	r.GET("/users/:id", app.GetUserHandler)
-	r.DELETE("/users/:id", app.DeleteUserHandler)
+	r.GET("/users", h.UsersHandler)
+	r.POST("/users", h.NewUserHandler)
+	r.GET("/users/:id", h.GetUserHandler)
+	r.DELETE("/users/:id", h.DeleteUserHandler)
 
 	r.Run(":8502")
 }
