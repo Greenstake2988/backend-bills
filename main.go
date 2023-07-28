@@ -23,9 +23,6 @@ func main() {
 	// routes Login
 	r.POST("/login", app.LoginUser)
 
-	// Agregando el middleware
-	r.Use(app.AuthMiddleware)
-
 	// routes Bills
 	r.GET("/bills", app.BillsHandler)
 	r.POST("/bills", app.NewBillHandler)
