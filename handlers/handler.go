@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/spf13/viper"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -14,7 +15,7 @@ func (h *Handler) ConnectDB() {
 
 	var err error
 	//Conexion sqlite3
-	h.DB, err = gorm.Open(sqlite.Open("bills.sqlite"), &gorm.Config{})
+	h.DB, err = gorm.Open(sqlite.Open(viper.GetString("DB")), &gorm.Config{})
 
 	if err != nil {
 		panic("error al conectar ala base de datos")

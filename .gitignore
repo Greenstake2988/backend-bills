@@ -1,2 +1,6 @@
 // DATABASE
 bills.sqlite
+
+// VARIABLES ENTORNO
+.env
+
