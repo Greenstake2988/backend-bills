@@ -13,7 +13,7 @@ import (
 func ValidatePassword(password string) error {
 	if len(password) < 8 {
 		return errors.New("la contraseña debe tener al menos 8 caracteres")
-	}
+	} 
 
 	// Usamos expresiones regulares para validar que haya al menos una letra mayúscula,
 	// una letra minúscula y un número en la contraseña.

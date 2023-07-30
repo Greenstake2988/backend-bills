@@ -76,8 +76,11 @@ func (h *Handler) LoginHandler(c *gin.Context) {
 		return
 	}
 
-	// Devolvemos el token
-	c.JSON(200, gin.H{"token": tokenString})
+	// Devolvemos el token y el ID del user
+	c.JSON(200, gin.H{
+		"id":    &user.ID,
+		"token": tokenString,
+	})
 }
 
 func (h *Handler) RegisterHandler(c *gin.Context) {
