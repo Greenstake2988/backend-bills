@@ -3,18 +3,14 @@ package main
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 
 	// need install GCC compiler
 
 	"go-test/handlers"
-	"go-test/middlewares"
 )
 
 func main() {
-	// Cargando las variables de entorno
-	godotenv.Load()
 
 	r := gin.Default()
 
@@ -31,7 +27,7 @@ func main() {
 	r.POST("/register", h.RegisterHandler)
 
 	//Agregando el Middlware token
-	r.Use(middlewares.AuthMiddleware)
+	//r.Use(middlewares.AuthMiddleware)
 	// routes Bills
 	r.GET("/bills", h.BillsHandler)
 	r.POST("/bills", h.NewBillHandler)

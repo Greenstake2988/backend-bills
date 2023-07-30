@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"go-test/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -54,7 +55,7 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 
 	// Convierte el Json en el tipo de objeto que necesitamos
 	if err := c.ShouldBindJSON(&newUser); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON Invalido"})
 		return
 	}
 
@@ -62,14 +63,20 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 	var existingUser User
 	if err := h.DB.Where("email = ?", newUser.Email).First(&existingUser).Error; err == nil {
 		// Correo electrónico ya existente, devolver mensaje de error en formato JSON
-		c.JSON(http.StatusBadRequest, gin.H{"error": "The Email already exist please use another."})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "El correo ya existe elige otro."})
+		return
+	}
+
+	// Validar la contraseña antes de guardarla en la base de datos
+	if err := utils.ValidatePassword(newUser.Password); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	// Hash de la contraseña antes de guardarla
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al hashear el password"})
 		return
 	}
 	// Pasamos el hased password al usuario nuevo
@@ -79,12 +86,12 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 	if err := h.DB.Create(&newUser).Error; err != nil {
 
 		// Si no es un error de clave externa, devolver otro mensaje de error genérico
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create User"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al crear el usuario"})
 		return
 	}
 
 	// Respond with a success message
-	c.JSON(http.StatusOK, gin.H{"message": "Received JSON", "data": newUser.Email})
+	c.JSON(http.StatusOK, gin.H{"message": "JSON Recibido", "data": newUser.Email})
 }
 func (handler *Handler) DeleteUserHandler(c *gin.Context) {
 	var user User

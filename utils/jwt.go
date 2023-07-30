@@ -40,9 +40,9 @@ func GetJWTPrivateKey() (*ecdsa.PrivateKey, error) {
 }
 
 // GenerateJWTToken genera un token JWT firmado con la clave privada ECDSA.
-func GenerateJWTToken(privateKey *ecdsa.PrivateKey, userEmail string, expirationInSeconds time.Duration) (string, error) {
+func GenerateJWTToken(privateKey *ecdsa.PrivateKey, userEmail string, expiration time.Duration) (string, error) {
 	// Convertir el valor de expiración en segundos a una duración
-	expiration := time.Duration(expirationInSeconds) * time.Second
+	expiration = time.Duration(expiration) * time.Second
 	// Crear un token JWT con las Claims deseadas
 	token := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
 		"email": userEmail,
