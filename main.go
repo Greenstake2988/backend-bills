@@ -1,9 +1,11 @@
 package main
 
 import (
+	"os"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
+	"github.com/joho/godotenv"
 
 	// need install GCC compiler
 
@@ -11,6 +13,12 @@ import (
 )
 
 func main() {
+
+	// Load environment variables from the .env file
+	err := godotenv.Load()
+	if err != nil {
+		// Handle error (e.g., if the .env file is missing)
+	}
 
 	r := gin.Default()
 
@@ -41,5 +49,5 @@ func main() {
 	r.PUT("/users/:id", h.UpdateUser)
 	r.DELETE("/users/:id", h.DeleteUserHandler)
 
-	r.Run(viper.GetString("PORT"))
+	r.Run(os.Getenv("PORT"))
 }
