@@ -93,7 +93,7 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 	// Respond with a success message
 	c.JSON(http.StatusOK, gin.H{"message": "JSON Recibido", "data": newUser.Email})
 }
-func (handler *Handler) DeleteUserHandler(c *gin.Context) {
+func (h *Handler) DeleteUserHandler(c *gin.Context) {
 	var user User
 
 	userID := c.Param("id")
@@ -105,17 +105,67 @@ func (handler *Handler) DeleteUserHandler(c *gin.Context) {
 	}
 
 	// find the first value in the data base with userID
-	if err := handler.DB.First(&user, userID).Error; err != nil {
+	if err := h.DB.First(&user, userID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
 
 	// borramos user y bills asociados
 	// unscoped para poder borrar definitivo
-	if err := handler.DB.Unscoped().Delete(&user).Error; err != nil {
+	if err := h.DB.Unscoped().Delete(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete User"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "User delete successfully"})
+}
+func (h *Handler) UpdateUser(c *gin.Context) {
+
+	// credentials
+	var updateData struct {
+		Password string `json:"password" binding:"required"`
+	}
+
+	// Convierte el Json en el tipo de objeto que necesitamos
+	if err := c.ShouldBindJSON(&updateData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON Invalido"})
+		return
+	}
+
+	// Validar la contraseña
+	if err := utils.ValidatePassword(updateData.Password); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Hash de la contraseña
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(updateData.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al hashear el password"})
+		return
+	}
+	//Recuperar el id de la ruta
+	userID := c.Param("id")
+	// Check if the "id" parameter is empty
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID Invalido"})
+		return
+	}
+	// Crear un usario en blanco
+	var user User
+	// ligar el usuario nuevo con los valores de la base de datos
+	if err := h.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Usuario no encontrado"})
+		return
+	}
+	// actualizamos al usuario
+	user.Password = string(hashedPassword)
+
+	// Guardamos los cambios
+	if err := h.DB.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Usuario actualizado con exito"})
 }

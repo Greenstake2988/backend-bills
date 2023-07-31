@@ -38,6 +38,7 @@ func main() {
 	r.GET("/users", h.UsersHandler)
 	r.POST("/users", h.NewUserHandler)
 	r.GET("/users/:id", h.GetUserHandler)
+	r.PUT("/users/:id", h.UpdateUser)
 	r.DELETE("/users/:id", h.DeleteUserHandler)
 
 	r.Run(viper.GetString("PORT"))
