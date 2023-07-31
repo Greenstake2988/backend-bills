@@ -16,7 +16,7 @@ func TestValidatePassword(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		err := ValidatePassword(test.password)
+		err := validatePassword(test.password)
 		if (err != nil) != test.wantErr {
 			t.Errorf("Para el password '%s', esperado error: %v, obtenido error: %v", test.password, test.wantErr, err)
 		}

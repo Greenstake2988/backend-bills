@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -67,20 +66,14 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 		return
 	}
 
-	// Validar la contraseña antes de guardarla en la base de datos
-	if err := utils.ValidatePassword(newUser.Password); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Hash de la contraseña antes de guardarla
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
+	// Validamos y hasehamos el password
+	hashedValidatedPassword, err := utils.HashAndValidatePassword(newUser.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al hashear el password"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 	// Pasamos el hased password al usuario nuevo
-	newUser.Password = string(hashedPassword)
+	newUser.Password = hashedValidatedPassword
 
 	// Aqui guardaremos en la base de datos
 	if err := h.DB.Create(&newUser).Error; err != nil {
@@ -132,18 +125,6 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	// Validar la contraseña
-	if err := utils.ValidatePassword(updateData.Password); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Hash de la contraseña
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(updateData.Password), bcrypt.DefaultCost)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al hashear el password"})
-		return
-	}
 	//Recuperar el id de la ruta
 	userID := c.Param("id")
 	// Check if the "id" parameter is empty
@@ -158,12 +139,20 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Usuario no encontrado"})
 		return
 	}
+
+	// Validamos y hasehamos el password
+	hashedValidatedPassword, err := utils.HashAndValidatePassword(updateData.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 	// actualizamos al usuario
-	user.Password = string(hashedPassword)
+	user.Password = hashedValidatedPassword
 
 	// Guardamos los cambios
 	if err := h.DB.Save(&user).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
