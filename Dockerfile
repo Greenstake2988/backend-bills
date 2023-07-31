@@ -17,8 +17,12 @@ COPY . .
 # copiar el archivo al contenedor
 RUN go build -o ./out/dist .
 
+ENV PORT=8080
 
-EXPOSE 8080
+# Expose the same port that the application listens on
+EXPOSE $PORT
+
+
 
 
 # Establece el punto de ejecucion
