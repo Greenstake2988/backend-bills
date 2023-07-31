@@ -18,6 +18,7 @@ COPY . .
 RUN go build -o ./out/dist .
 
 
+EXPOSE 8080
 
 
 # Establece el punto de ejecucion
