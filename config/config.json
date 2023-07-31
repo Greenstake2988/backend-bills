@@ -1,5 +1,5 @@
 {
     "token_expiration": 3600,
-    "PORT": ":80",
+    "PORT": ":8080",
     "DB": "bills.sqlite"
 }
