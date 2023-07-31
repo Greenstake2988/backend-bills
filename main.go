@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/gin-contrib/cors"
@@ -15,10 +16,8 @@ import (
 func main() {
 
 	// Load environment variables from the .env file
-	err := godotenv.Load()
-	if err != nil {
-		// Handle error (e.g., if the .env file is missing)
-	}
+	godotenv.Load()
+	port := os.Getenv("PORT")
 
 	r := gin.Default()
 
@@ -49,5 +48,5 @@ func main() {
 	r.PUT("/users/:id", h.UpdateUser)
 	r.DELETE("/users/:id", h.DeleteUserHandler)
 
-	r.Run(os.Getenv("PORT"))
+	r.Run(fmt.Sprintf("0.0.0.0:%s", port))
 }
