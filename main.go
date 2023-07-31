@@ -7,7 +7,7 @@ import (
 
 	// need install GCC compiler
 
-	"go-test/handlers"
+	"backend-bills/handlers"
 )
 
 func main() {

@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"go-test/utils"
+	"backend-bills/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

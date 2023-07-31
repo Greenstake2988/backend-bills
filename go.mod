@@ -1,4 +1,4 @@
-module go-test
+module backend-bills
 
 go 1.20
 
