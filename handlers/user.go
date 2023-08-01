@@ -6,12 +6,13 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
 
 type User struct {
 	gorm.Model
-	Email    string    `json:"email" binding:"required" gorm:"unique"`
+	Email    string    `json:"email" binding:"required,email" gorm:"unique"`
 	Password string    `json:"password" binding:"required"`
 	Date     time.Time `json:"date" gorm:"type:date"`
 	Bills    []Bill    `json:"bills" gorm:"constraint:OnDelete:CASCADE"`
@@ -56,7 +57,16 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 
 	// Convierte el Json en el tipo de objeto que necesitamos
 	if err := c.ShouldBindJSON(&newUser); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON Invalido"})
+		// Checar si el error es de la validacion de campos de la libreria
+		if verr, ok := err.(validator.ValidationErrors); ok {
+			var errors []string
+			for _, e := range verr {
+				errors = append(errors, "El "+e.Field()+" no es Valido")
+			}
+			c.JSON(http.StatusBadRequest, gin.H{"errors": errors})
+			return
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
