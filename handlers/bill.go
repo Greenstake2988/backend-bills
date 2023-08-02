@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/mattn/go-sqlite3"
 	"gorm.io/gorm"
 )
@@ -54,10 +55,18 @@ func (h *Handler) NewBillHandler(c *gin.Context) {
 
 	// Convierte el Json en el tipo de objeto que necesitamos
 	if err := c.ShouldBindJSON(&newBill); err != nil {
+		// Checar si el error es de la validacion de campos de la libreria
+		if verr, ok := err.(validator.ValidationErrors); ok {
+			var errors []string
+			for _, e := range verr {
+				errors = append(errors, "El "+e.Field()+" no es Valido")
+			}
+			c.JSON(http.StatusBadRequest, gin.H{"errors": errors})
+			return
+		}
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
 	// Si la fecha no fue proporcionada o esta en blano le pones la fecha de Ahora
 	if newBill.Date.IsZero() {
 		newBill.Date = time.Now()
