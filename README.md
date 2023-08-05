@@ -45,7 +45,7 @@ curl --location 'https://backend-bills-v7nohlccfa-uc.a.run.app/users'
 curl --location 'https://backend-bills-v7nohlccfa-uc.a.run.app/users/REPLACE_WITH_USER_ID'
 ```
 
-### Update User
+#### Update User
 
 ``` 
 curl --location --request PUT 'https://backend-bills-v7nohlccfa-uc.a.run.app/users/REPLACE_WITH_USER_ID'  \
