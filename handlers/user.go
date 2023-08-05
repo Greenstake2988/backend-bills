@@ -3,7 +3,6 @@ package handlers
 import (
 	"backend-bills/utils"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -12,10 +11,9 @@ import (
 
 type User struct {
 	gorm.Model
-	Email    string    `json:"email" binding:"required,email" gorm:"unique"`
-	Password string    `json:"password" binding:"required"`
-	Date     time.Time `json:"date" gorm:"type:date"`
-	Bills    []Bill    `json:"bills" gorm:"constraint:OnDelete:CASCADE"`
+	Email    string `json:"email" binding:"required,email" gorm:"unique"`
+	Password string `json:"password" binding:"required"`
+	Bills    []Bill `json:"bills" gorm:"constraint:OnDelete:CASCADE"`
 }
 
 // Rutas Users
@@ -68,11 +66,6 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 		}
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
-	}
-
-	// Si la fecha no fue proporcionada o esta en blano le pones la fecha de Ahora
-	if newUser.Date.IsZero() {
-		newUser.Date = time.Now()
 	}
 
 	// Verificar si el correo electrónico ya existe en la base de datos
@@ -158,10 +151,6 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	// Si recibimos una nueva fecha la actualizamos
-	if !updateData.Date.IsZero() {
-		newUser.Date = updateData.Date.Time
-	}
 
 	// Si Recibimos el password lo intercambiamos
 	if updateData.Password != "" {
