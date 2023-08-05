@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/spf13/viper"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -14,8 +16,16 @@ type Handler struct {
 func (h *Handler) ConnectDB() {
 
 	var err error
-	//Conexion sqlite3
-	h.DB, err = gorm.Open(sqlite.Open(viper.GetString("DB")), &gorm.Config{})
+
+	// Leer las variables de entorno usando Viper
+	host := viper.GetString("DB_HOST")
+	user := viper.GetString("DB_USER")
+	password := viper.GetString("DB_PASSWORD")
+	dbname := viper.GetString("DB_NAME")
+	port := viper.GetString("DB_PORT")
+
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s", host, user, password, dbname, port)
+	h.DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
 		panic("error al conectar ala base de datos")
@@ -23,9 +33,6 @@ func (h *Handler) ConnectDB() {
 
 	// AutoMigrate intenta crear la tabala si no existe
 	err = h.DB.AutoMigrate(&User{}, &Bill{})
-
-	// Habilitamos la funcion para poder usar claves foraneas
-	h.DB.Exec("PRAGMA foreign_keys = ON;")
 
 	if err != nil {
 		panic("Error al crear la tabla en la base de datos")

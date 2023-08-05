@@ -1,5 +1,10 @@
 {
     "token_expiration": 3600,
     "PORT": ":8080",
-    "DB": "bills.sqlite"
+    "DB": "bills.sqlite",
+    "DB_HOST": "containers-us-west-172.railway.app",
+    "DB_USER": "postgres",
+    "DB_PASSWORD": "xozm0bp5we9rXOk2U8gP",
+    "DB_NAME": "railway",
+    "DB_PORT": "5500 "
 }
