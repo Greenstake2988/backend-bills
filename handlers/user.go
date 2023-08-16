@@ -52,19 +52,21 @@ func (h *Handler) UsersHandler(c *gin.Context) {
 }
 func (h *Handler) NewUserHandler(c *gin.Context) {
 	var newUser User
+	var errors []string
 
 	// Convierte el Json en el tipo de objeto que necesitamos
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		// Checar si el error es de la validacion de campos de la libreria
 		if verr, ok := err.(validator.ValidationErrors); ok {
-			var errors []string
+
 			for _, e := range verr {
 				errors = append(errors, "El "+e.Field()+" no es Valido")
 			}
 			c.JSON(http.StatusBadRequest, gin.H{"errors": errors})
 			return
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errors = append(errors, err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": errors})
 		return
 	}
 
@@ -72,14 +74,16 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 	var existingUser User
 	if err := h.DB.Where("email = ?", newUser.Email).First(&existingUser).Error; err == nil {
 		// Correo electrónico ya existente, devolver mensaje de error en formato JSON
-		c.JSON(http.StatusBadRequest, gin.H{"error": "El correo ya existe elige otro."})
+		errors = append(errors, "El correo ya existe elige otro.")
+		c.JSON(http.StatusBadRequest, gin.H{"errors": errors})
 		return
 	}
 
 	// Validamos y hasehamos el password
 	hashedValidatedPassword, err := utils.HashAndValidatePassword(newUser.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		errors = append(errors, err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"errors": errors})
 		return
 	}
 	// Pasamos el hased password al usuario nuevo
@@ -89,7 +93,9 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 	if err := h.DB.Create(&newUser).Error; err != nil {
 
 		// Si no es un error de clave externa, devolver otro mensaje de error genérico
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al crear el usuario"})
+		errors = append(errors, "Error al crear el usuario")
+		c.JSON(http.StatusInternalServerError, gin.H{"errors": errors})
+
 		return
 	}
 
@@ -150,7 +156,6 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Usuario no encontrado"})
 		return
 	}
-
 
 	// Si Recibimos el password lo intercambiamos
 	if updateData.Password != "" {
