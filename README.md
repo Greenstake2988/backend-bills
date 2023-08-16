@@ -64,7 +64,7 @@ curl --location --request DELETE 'https://backend-bills-v7nohlccfa-uc.a.run.app/
 
 ## Bill Requests
 
-#### Crear User
+#### Crear Bill
 ``` 
 curl --location 'https://backend-bills-v7nohlccfa-uc.a.run.app/bills' \
 --header 'Content-Type: text/json' \
