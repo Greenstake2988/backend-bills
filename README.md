@@ -59,3 +59,18 @@ curl --location --request PUT 'https://backend-bills-v7nohlccfa-uc.a.run.app/use
 ``` 
 curl --location --request DELETE 'https://backend-bills-v7nohlccfa-uc.a.run.app/users/REPLACE_WITH_USER_ID'
 ```
+
+
+
+## Bill Requests
+
+#### Crear Bill
+``` 
+curl --location 'https://backend-bills-v7nohlccfa-uc.a.run.app/bills' \
+--header 'Content-Type: text/json' \
+--data '{
+    "user_id": 1,
+    "concept": "oxxo",
+    "price":  100.00
+}'
+```
