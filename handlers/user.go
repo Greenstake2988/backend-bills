@@ -16,6 +16,8 @@ type User struct {
 	Bills    []Bill `json:"bills" gorm:"constraint:OnDelete:CASCADE"`
 }
 
+
+
 // Rutas Users
 func (h *Handler) GetUserHandler(c *gin.Context) {
 	var user User
@@ -51,6 +53,7 @@ func (h *Handler) UsersHandler(c *gin.Context) {
 	})
 }
 func (h *Handler) NewUserHandler(c *gin.Context) {
+	// TODO: implementar errores en una sola lista
 	var newUser User
 	var errors []string
 

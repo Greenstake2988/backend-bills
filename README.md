@@ -42,7 +42,17 @@ curl --location 'https://backend-bills-v7nohlccfa-uc.a.run.app/users'
 
 #### Fetch User
 ``` 
-curl --location 'https://backend-bills-v7nohlccfa-uc.a.run.app/users/REPLACE_WITH_USER_ID'
+curl --location 'https://backend-bills-v7nohlccfa-uc.a.run.app/users/REPLACE_WITH_USER_ID' \
+--header 'Content-Type: text/json' \
+--data '{
+    "ID": 2,
+    "CreatedAt": "2023-08-05T15:33:56.610933Z",
+    "UpdatedAt": "2023-08-05T15:55:59.774466Z",
+    "DeletedAt": null,
+    "email": "NoelChupaPijas@hotmail.com",
+    "password": "$2a$10$wcDnsqwJ2yNxzRE/40qWOe6HvcOInwdjtlyBtqUFUXgpmQux.jwHS",
+    "bills": []
+}'
 ```
 
 #### Update User
