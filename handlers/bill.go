@@ -1,26 +1,17 @@
 package handlers
 
 import (
+	"backend-bills/models"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/mattn/go-sqlite3"
-	"gorm.io/gorm"
 )
-
-type Bill struct {
-	gorm.Model
-	UserID  uint      `json:"user_id" binding:"required"`
-	Concept string    `json:"concept" binding:"required"`
-	Price   float32   `json:"price" binding:"required"`
-	Date    time.Time `json:"date" gorm:"type:date"`
-}
 
 // Rutas Bills
 func (h *Handler) GetBillHandler(c *gin.Context) {
-	var bill Bill
+	var bill models.Bill
 
 	billID := c.Param("id")
 
@@ -38,9 +29,10 @@ func (h *Handler) GetBillHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, bill)
 }
+
 func (h *Handler) BillsHandler(c *gin.Context) {
 	// fecthar los datos de la base de datos
-	var bills []Bill
+	var bills []models.Bill
 	h.DB.Find(&bills)
 
 	// Set the "Access-Control-Allow-Origin" header to allow all origins (*)
@@ -51,7 +43,7 @@ func (h *Handler) BillsHandler(c *gin.Context) {
 	})
 }
 func (h *Handler) NewBillHandler(c *gin.Context) {
-	var newBill Bill
+	var newBill models.Bill
 
 	// Convierte el Json en el tipo de objeto que necesitamos
 	if err := c.ShouldBindJSON(&newBill); err != nil {
@@ -74,11 +66,7 @@ func (h *Handler) NewBillHandler(c *gin.Context) {
 
 	// Aqui guardaremos en la base de datos
 	if err := h.DB.Create(&newBill).Error; err != nil {
-		//Verificamos si cumple con la restricciond e llave foranea
-		if isForeignKeyConstraintError(err) {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "el user_id debe ser de un usuario real"})
-			return
-		}
+
 		// Si no es un error de clave externa, devolver otro mensaje de error genérico
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al crear la Bills"})
 		return
@@ -88,7 +76,7 @@ func (h *Handler) NewBillHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "JSON Recibido", "data": newBill.Concept})
 }
 func (h *Handler) DeleteBillHandler(c *gin.Context) {
-	var bill Bill
+	var bill models.Bill
 
 	billID := c.Param("id")
 
@@ -111,13 +99,4 @@ func (h *Handler) DeleteBillHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Bill delete successfully"})
-}
-
-func isForeignKeyConstraintError(err error) bool {
-	sqliteErr, ok := err.(sqlite3.Error)
-	if !ok {
-		return false
-	}
-
-	return sqliteErr.Code == sqlite3.ErrConstraint
 }

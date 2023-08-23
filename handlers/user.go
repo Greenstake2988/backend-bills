@@ -1,26 +1,17 @@
 package handlers
 
 import (
+	"backend-bills/models"
 	"backend-bills/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"gorm.io/gorm"
 )
-
-type User struct {
-	gorm.Model
-	Email    string `json:"email" binding:"required,email" gorm:"unique"`
-	Password string `json:"password" binding:"required"`
-	Bills    []Bill `json:"bills" gorm:"constraint:OnDelete:CASCADE"`
-}
-
-
 
 // Rutas Users
 func (h *Handler) GetUserHandler(c *gin.Context) {
-	var user User
+	var user models.User
 
 	userID := c.Param("id")
 
@@ -40,7 +31,7 @@ func (h *Handler) GetUserHandler(c *gin.Context) {
 }
 func (h *Handler) UsersHandler(c *gin.Context) {
 	// fecthar los datos de la base de datos
-	var users []User
+	var users []models.User
 	// SELECT * FROM users;
 	// SELECT * FROM bills WHERE user_id IN (1,2,3,4);
 	h.DB.Preload("Bills").Find(&users)
@@ -54,7 +45,7 @@ func (h *Handler) UsersHandler(c *gin.Context) {
 }
 func (h *Handler) NewUserHandler(c *gin.Context) {
 	// TODO: implementar errores en una sola lista
-	var newUser User
+	var newUser models.User
 	var errors []string
 
 	// Convierte el Json en el tipo de objeto que necesitamos
@@ -74,7 +65,7 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 	}
 
 	// Verificar si el correo electrónico ya existe en la base de datos
-	var existingUser User
+	var existingUser models.User
 	if err := h.DB.Where("email = ?", newUser.Email).First(&existingUser).Error; err == nil {
 		// Correo electrónico ya existente, devolver mensaje de error en formato JSON
 		errors = append(errors, "El correo ya existe elige otro.")
@@ -106,7 +97,7 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "JSON Recibido", "data": newUser.Email})
 }
 func (h *Handler) DeleteUserHandler(c *gin.Context) {
-	var user User
+	var user models.User
 
 	userID := c.Param("id")
 
@@ -153,7 +144,7 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 	}
 
 	// Crear un usario en blanco
-	var newUser User
+	var newUser models.User
 	// ligar el usuario nuevo con los valores de la base de datos
 	if err := h.DB.First(&newUser, userID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Usuario no encontrado"})
