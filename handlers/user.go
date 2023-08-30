@@ -19,8 +19,7 @@ type User struct {
 
 const (
 	ErrorEmailInvalid = 1
-
-	ErrorCreateUser = 8
+	ErrorCreateUser   = 8
 )
 
 // Rutas Users
@@ -68,7 +67,8 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 		if verr, ok := err.(validator.ValidationErrors); ok {
 
 			for _, e := range verr {
-				errorCode := fieldErrorCodes[e.Field()]
+				//errorCode := fieldErrorCodes[e.Field()]
+				errorCode := 2
 				errors = append(errors, models.APIError{Code: errorCode, Message: "El " + e.Field() + " no es válido"})
 			}
 
