@@ -9,7 +9,6 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-playground/validator/v10 v10.14.1
 	github.com/joho/godotenv v1.5.1
-	github.com/mattn/go-sqlite3 v1.14.17
 	github.com/spf13/viper v1.16.0
 	golang.org/x/crypto v0.12.0
 	gorm.io/driver/postgres v1.5.2

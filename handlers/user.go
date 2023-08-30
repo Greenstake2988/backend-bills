@@ -7,16 +7,21 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"gorm.io/gorm"
 )
 
 type User struct {
 	gorm.Model
-	Email    string `json:"email" binding:"required,email" gorm:"unique"`
-	Password string `json:"password" binding:"required"`
-	Bills    []Bill `json:"bills" gorm:"constraint:OnDelete:CASCADE"`
+	Email    string        `json:"email" binding:"required,email" gorm:"unique"`
+	Password string        `json:"password" binding:"required"`
+	Bills    []models.Bill `json:"bills" gorm:"constraint:OnDelete:CASCADE"`
 }
 
+const (
+	ErrorEmailInvalid = 1
 
+	ErrorCreateUser = 8
+)
 
 // Rutas Users
 func (h *Handler) GetUserHandler(c *gin.Context) {
@@ -55,7 +60,7 @@ func (h *Handler) UsersHandler(c *gin.Context) {
 func (h *Handler) NewUserHandler(c *gin.Context) {
 	// TODO: implementar errores en una sola lista
 	var newUser User
-	var errors []string
+	var errors []models.APIError
 
 	// Convierte el Json en el tipo de objeto que necesitamos
 	if err := c.ShouldBindJSON(&newUser); err != nil {
