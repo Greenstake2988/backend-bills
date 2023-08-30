@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"gorm.io/gorm"
 )
 
 type User struct {
@@ -15,8 +16,6 @@ type User struct {
 	Password string `json:"password" binding:"required"`
 	Bills    []Bill `json:"bills" gorm:"constraint:OnDelete:CASCADE"`
 }
-
-
 
 // Rutas Users
 func (h *Handler) GetUserHandler(c *gin.Context) {
