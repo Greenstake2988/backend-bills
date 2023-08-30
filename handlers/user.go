@@ -18,6 +18,12 @@ type User struct {
 }
 
 
+const (
+	ErrorCreateUser = 8
+	ErrorEmailInvalid = 1
+)
+
+
 
 // Rutas Users
 func (h *Handler) GetUserHandler(c *gin.Context) {
