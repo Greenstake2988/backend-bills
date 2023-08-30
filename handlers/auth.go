@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend-bills/models"
 	"backend-bills/utils"
 	"net/http"
 	"time"
@@ -28,7 +29,7 @@ func (h *Handler) LoginHandler(c *gin.Context) {
 	}
 
 	// Chek if teh credentials exist and mount the bills into the user
-	var user User
+	var user models.User
 	err := h.DB.Where("email = ?", loginData.Email).Preload("Bills").First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {

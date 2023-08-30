@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend-bills/models"
 	"fmt"
 
 	"github.com/spf13/viper"
@@ -32,7 +33,7 @@ func (h *Handler) ConnectDB() {
 	}
 
 	// AutoMigrate intenta crear la tabala si no existe
-	err = h.DB.AutoMigrate(&User{}, &Bill{})
+	err = h.DB.AutoMigrate(&models.User{}, &models.Bill{})
 
 	if err != nil {
 		panic("Error al crear la tabla en la base de datos")

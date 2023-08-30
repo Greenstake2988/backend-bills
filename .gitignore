@@ -1,8 +1,4 @@
-// DATABASE
-bills.sqlite
 
-// VARIABLES ENTORNO
-.env
 
 // Ejecutable
 backend-bills

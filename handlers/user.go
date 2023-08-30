@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"gorm.io/gorm"
 )
 
 type User struct {
@@ -17,24 +16,11 @@ type User struct {
 	Bills    []Bill `json:"bills" gorm:"constraint:OnDelete:CASCADE"`
 }
 
-const (
-	//ErrorUsernameInvalid = 1
-	ErrorEmailInvalid    = 1
-	ErrorPasswordInvalid = 2
-	ErrorCreateUser      = 8
-	// Agrega más códigos de error según sea necesario
-)
 
-var fieldErrorCodes = map[string]int{
-	//"username": ErrorUsernameInvalid,
-	"Email":    ErrorEmailInvalid,
-	"Password": ErrorPasswordInvalid,
-	// Agrega más campos según sea necesario
-}
 
 // Rutas Users
 func (h *Handler) GetUserHandler(c *gin.Context) {
-	var user User
+	var user models.User
 
 	userID := c.Param("id")
 
@@ -54,7 +40,7 @@ func (h *Handler) GetUserHandler(c *gin.Context) {
 }
 func (h *Handler) UsersHandler(c *gin.Context) {
 	// fecthar los datos de la base de datos
-	var users []User
+	var users []models.User
 	// SELECT * FROM users;
 	// SELECT * FROM bills WHERE user_id IN (1,2,3,4);
 	h.DB.Preload("Bills").Find(&users)
@@ -69,7 +55,7 @@ func (h *Handler) UsersHandler(c *gin.Context) {
 func (h *Handler) NewUserHandler(c *gin.Context) {
 	// TODO: implementar errores en una sola lista
 	var newUser User
-	var errors []models.APIError
+	var errors []string
 
 	// Convierte el Json en el tipo de objeto que necesitamos
 	if err := c.ShouldBindJSON(&newUser); err != nil {
@@ -86,7 +72,7 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 	}
 
 	// Verificar si el correo electrónico ya existe en la base de datos
-	var existingUser User
+	var existingUser models.User
 	if err := h.DB.Where("email = ?", newUser.Email).First(&existingUser).Error; err == nil {
 		// Correo electrónico ya existente, devolver mensaje de error en formato JSON
 		errors = append(errors, models.APIError{Code: ErrorEmailInvalid, Message: "El correo ya existe elige otro."})
@@ -122,7 +108,7 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "JSON Recibido", "data": newUser.Email})
 }
 func (h *Handler) DeleteUserHandler(c *gin.Context) {
-	var user User
+	var user models.User
 
 	userID := c.Param("id")
 
@@ -169,7 +155,7 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 	}
 
 	// Crear un usario en blanco
-	var newUser User
+	var newUser models.User
 	// ligar el usuario nuevo con los valores de la base de datos
 	if err := h.DB.First(&newUser, userID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Usuario no encontrado"})
