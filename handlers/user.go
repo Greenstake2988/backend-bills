@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend-bills/models"
 	"backend-bills/utils"
 	"net/http"
 
@@ -16,7 +17,20 @@ type User struct {
 	Bills    []Bill `json:"bills" gorm:"constraint:OnDelete:CASCADE"`
 }
 
+const (
+	//ErrorUsernameInvalid = 1
+	ErrorEmailInvalid    = 1
+	ErrorPasswordInvalid = 2
+	ErrorCreateUser      = 8
+	// Agrega más códigos de error según sea necesario
+)
 
+var fieldErrorCodes = map[string]int{
+	//"username": ErrorUsernameInvalid,
+	"Email":    ErrorEmailInvalid,
+	"Password": ErrorPasswordInvalid,
+	// Agrega más campos según sea necesario
+}
 
 // Rutas Users
 func (h *Handler) GetUserHandler(c *gin.Context) {
@@ -55,7 +69,7 @@ func (h *Handler) UsersHandler(c *gin.Context) {
 func (h *Handler) NewUserHandler(c *gin.Context) {
 	// TODO: implementar errores en una sola lista
 	var newUser User
-	var errors []string
+	var errors []models.APIError
 
 	// Convierte el Json en el tipo de objeto que necesitamos
 	if err := c.ShouldBindJSON(&newUser); err != nil {
@@ -63,30 +77,32 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 		if verr, ok := err.(validator.ValidationErrors); ok {
 
 			for _, e := range verr {
-				errors = append(errors, "El "+e.Field()+" no es Valido")
+				errorCode := fieldErrorCodes[e.Field()]
+				errors = append(errors, models.APIError{Code: errorCode, Message: "El " + e.Field() + " no es válido"})
 			}
-			c.JSON(http.StatusBadRequest, gin.H{"errors": errors})
-			return
+
 		}
-		errors = append(errors, err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": errors})
-		return
+
 	}
 
 	// Verificar si el correo electrónico ya existe en la base de datos
 	var existingUser User
 	if err := h.DB.Where("email = ?", newUser.Email).First(&existingUser).Error; err == nil {
 		// Correo electrónico ya existente, devolver mensaje de error en formato JSON
-		errors = append(errors, "El correo ya existe elige otro.")
-		c.JSON(http.StatusBadRequest, gin.H{"errors": errors})
-		return
+		errors = append(errors, models.APIError{Code: ErrorEmailInvalid, Message: "El correo ya existe elige otro."})
+
 	}
 
 	// Validamos y hasehamos el password
 	hashedValidatedPassword, err := utils.HashAndValidatePassword(newUser.Password)
-	if err != nil {
-		errors = append(errors, err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"errors": errors})
+	for _, e := range err {
+
+		errors = append(errors, models.APIError{Code: e.Code, Message: e.Message})
+	}
+
+	// Si alguno dio un error entonces salimos
+	if errors != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"errors": errors})
 		return
 	}
 	// Pasamos el hased password al usuario nuevo
@@ -96,7 +112,7 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 	if err := h.DB.Create(&newUser).Error; err != nil {
 
 		// Si no es un error de clave externa, devolver otro mensaje de error genérico
-		errors = append(errors, "Error al crear el usuario")
+		errors = append(errors, models.APIError{Code: ErrorCreateUser, Message: "Error al crear el usuario"})
 		c.JSON(http.StatusInternalServerError, gin.H{"errors": errors})
 
 		return
@@ -165,7 +181,7 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 		// Validamos y hasehamos el password
 		hashedValidatedPassword, err := utils.HashAndValidatePassword(updateData.Password)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "error password"})
 			return
 		}
 		// actualizamos al usuario
