@@ -17,10 +17,7 @@ type User struct {
 	Bills    []models.Bill `json:"bills" gorm:"constraint:OnDelete:CASCADE"`
 }
 
-const (
-	ErrorEmailInvalid = 1
-	ErrorCreateUser   = 8
-)
+
 
 // Rutas Users
 func (h *Handler) GetUserHandler(c *gin.Context) {
