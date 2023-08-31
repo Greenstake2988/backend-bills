@@ -1,4 +1,6 @@
 
+//Variables de entorno
+.env
 
 // Ejecutable
 backend-bills
