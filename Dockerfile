@@ -15,7 +15,7 @@ COPY go.mod go.sum config ./
 RUN go mod download
 COPY . .
 # copiar el archivo al contenedor
-RUN go build -o ./out/dist ./main.go
+RUN go build -o ./out/dist .
 
 ENV PORT=8080
 
