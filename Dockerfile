@@ -8,14 +8,14 @@ WORKDIR /app
 COPY go.mod go.sum config ./
 # Instala el paquete de SQLite3
 # Actualiza el sistema de paquetes
-RUN apk update
+#RUN apk update
 #RUN apk add --no-cache sqlite sqlite-dev
 #RUN apk add --no-cache build-base
 
 RUN go mod download
 COPY . .
 # copiar el archivo al contenedor
-RUN go build -o ./out/dist .
+RUN go build -o ./out/dist ./main.go
 
 ENV PORT=8080
 
