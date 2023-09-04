@@ -4,6 +4,7 @@ import (
 	"backend-bills/models"
 	"backend-bills/utils"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -28,6 +29,8 @@ func (h *Handler) LoginHandler(c *gin.Context) {
 		return
 	}
 
+	// Eliminamos cosas innecesrias del texto
+	loginData.Email = strings.Trim(loginData.Email, " \t\n\r")
 	// Chek if teh credentials exist and mount the bills into the user
 	var user models.User
 	err := h.DB.Where("email = ?", loginData.Email).Preload("Bills").First(&user).Error
