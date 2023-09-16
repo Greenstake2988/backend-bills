@@ -6,5 +6,11 @@
     "DB_USER": "postgres",
     "DB_PASSWORD": "xozm0bp5we9rXOk2U8gP",
     "DB_NAME": "railway",
-    "DB_PORT": "5500 "
+    "DB_PORT": "5500 ",
+    "SMTP": {
+        "SERVER": "smtp.gmail.com",
+        "PORT": 587,
+        "USERNAME": "billiebills.noreply@gmail.com",
+        "PASSWORD": "xwuf tlcx shrm ffxx"
+    }
 }

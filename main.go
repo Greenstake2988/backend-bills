@@ -27,6 +27,11 @@ func main() {
 	// Conexion ala base de datos
 	h := &handlers.Handler{}
 	h.ConnectDB()
+
+	// if err := h.DB.AutoMigrate(&models.User{}); err != nil {
+	// 	fmt.Println("NO SE MIGRO")
+	// }
+
 	// Enable CORS middleware with permissive configuration
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
@@ -51,5 +56,7 @@ func main() {
 	r.PUT("/users/:id", h.UpdateUser)
 	r.DELETE("/users/:id", h.DeleteUserHandler)
 
+	//services.SendVerificationCodeEmail("noelhpa@gmail.com")
 	r.Run(fmt.Sprintf("0.0.0.0:%s", port))
+
 }

@@ -2,20 +2,13 @@ package handlers
 
 import (
 	"backend-bills/models"
+	"backend-bills/services"
 	"backend-bills/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"gorm.io/gorm"
 )
-
-type User struct {
-	gorm.Model
-	Email    string        `json:"email" binding:"required,email" gorm:"unique"`
-	Password string        `json:"password" binding:"required"`
-	Bills    []models.Bill `json:"bills" gorm:"constraint:OnDelete:CASCADE"`
-}
 
 const (
 	ErrorCreateUser   = 8
@@ -56,8 +49,7 @@ func (h *Handler) UsersHandler(c *gin.Context) {
 	})
 }
 func (h *Handler) NewUserHandler(c *gin.Context) {
-	// TODO: implementar errores en una sola lista
-	var newUser User
+	var newUser models.User
 	var errors []models.APIError
 
 	// Convierte el Json en el tipo de objeto que necesitamos
@@ -98,6 +90,10 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 	// Pasamos el hased password al usuario nuevo
 	newUser.Password = hashedValidatedPassword
 
+	//Crear un codigo de verificacion
+	newUser.VerificationCode = utils.GenerateVerificationCode()
+	newUser.VerificationStatusEmail = false
+
 	// Aqui guardaremos en la base de datos
 	if err := h.DB.Create(&newUser).Error; err != nil {
 
@@ -108,9 +104,15 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 		return
 	}
 
+	// Enviamos el codigo de verifiacion al correo electronico
+	if err := services.SendVerificationCodeEmail(newUser.Email, newUser.VerificationCode); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	// Respond with a success message
 	c.JSON(http.StatusOK, gin.H{"message": "JSON Recibido", "data": newUser.Email})
 }
+
 func (h *Handler) DeleteUserHandler(c *gin.Context) {
 	var user models.User
 
