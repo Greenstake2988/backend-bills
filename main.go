@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-
+	gin.SetMode(gin.ReleaseMode)
 	// Load environment variables from the .env file
 	godotenv.Load()
 	port := os.Getenv("PORT")
@@ -28,10 +28,6 @@ func main() {
 	h := &handlers.Handler{}
 	h.ConnectDB()
 
-	// if err := h.DB.AutoMigrate(&models.User{}); err != nil {
-	// 	fmt.Println("NO SE MIGRO")
-	// }
-
 	// Enable CORS middleware with permissive configuration
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
@@ -40,6 +36,7 @@ func main() {
 	// routes Auth
 	r.POST("/login", h.LoginHandler)
 	r.POST("/register", h.RegisterHandler)
+	r.POST("/verification", h.Verification)
 
 	//Agregando el Middlware token
 	//r.Use(middlewares.AuthMiddleware)
