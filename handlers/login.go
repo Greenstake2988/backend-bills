@@ -14,7 +14,7 @@ import (
 )
 
 // Rutas Auth
-func (h *Handler) LoginHandler(c *gin.Context) {
+func (h *Handler) Login(c *gin.Context) {
 
 	// struct only use for this handler
 	// credentials
@@ -41,6 +41,11 @@ func (h *Handler) LoginHandler(c *gin.Context) {
 			return
 		}
 		c.JSON(500, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	if !user.VerificationStatusEmail {
+		c.JSON(400, gin.H{"error": "unverified user"})
 		return
 	}
 
@@ -87,6 +92,6 @@ func (h *Handler) LoginHandler(c *gin.Context) {
 	})
 }
 
-func (h *Handler) RegisterHandler(c *gin.Context) {
-	h.NewUserHandler(c)
+func (h *Handler) Register(c *gin.Context) {
+	h.NewUser(c)
 }

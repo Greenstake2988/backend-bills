@@ -34,24 +34,24 @@ func main() {
 	r.Use(cors.New(config))
 
 	// routes Auth
-	r.POST("/login", h.LoginHandler)
-	r.POST("/register", h.RegisterHandler)
+	r.POST("/login", h.Login)
+	r.POST("/register", h.Register)
 	r.POST("/verification", h.Verification)
 
 	//Agregando el Middlware token
 	//r.Use(middlewares.AuthMiddleware)
 	// routes Bills
-	r.GET("/bills", h.BillsHandler)
-	r.POST("/bills", h.NewBillHandler)
-	r.GET("/bills/:id", h.GetBillHandler)
-	r.DELETE("/bills/:id", h.DeleteBillHandler)
+	r.GET("/bills", h.Bills)
+	r.POST("/bills", h.NewBill)
+	r.GET("/bills/:id", h.GetBill)
+	r.DELETE("/bills/:id", h.DeleteBill)
 
 	// routes Users
-	r.GET("/users", h.UsersHandler)
-	r.POST("/users", h.NewUserHandler)
-	r.GET("/users/:id", h.GetUserHandler)
+	r.GET("/users", h.Users)
+	r.POST("/users", h.NewUser)
+	r.GET("/users/:id", h.GetUser)
 	r.PUT("/users/:id", h.UpdateUser)
-	r.DELETE("/users/:id", h.DeleteUserHandler)
+	r.DELETE("/users/:id", h.DeleteUser)
 
 	//services.SendVerificationCodeEmail("noelhpa@gmail.com")
 	r.Run(fmt.Sprintf("0.0.0.0:%s", port))

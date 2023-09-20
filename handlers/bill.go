@@ -10,7 +10,7 @@ import (
 )
 
 // Rutas Bills
-func (h *Handler) GetBillHandler(c *gin.Context) {
+func (h *Handler) GetBill(c *gin.Context) {
 	var bill models.Bill
 
 	billID := c.Param("id")
@@ -30,7 +30,7 @@ func (h *Handler) GetBillHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, bill)
 }
 
-func (h *Handler) BillsHandler(c *gin.Context) {
+func (h *Handler) Bills(c *gin.Context) {
 	// fecthar los datos de la base de datos
 	var bills []models.Bill
 	h.DB.Find(&bills)
@@ -42,7 +42,7 @@ func (h *Handler) BillsHandler(c *gin.Context) {
 		"bills": bills,
 	})
 }
-func (h *Handler) NewBillHandler(c *gin.Context) {
+func (h *Handler) NewBill(c *gin.Context) {
 	var newBill models.Bill
 
 	// Convierte el Json en el tipo de objeto que necesitamos
@@ -75,7 +75,7 @@ func (h *Handler) NewBillHandler(c *gin.Context) {
 	// Respond with a success message
 	c.JSON(http.StatusOK, gin.H{"message": "JSON Recibido", "data": newBill.Concept})
 }
-func (h *Handler) DeleteBillHandler(c *gin.Context) {
+func (h *Handler) DeleteBill(c *gin.Context) {
 	var bill models.Bill
 
 	billID := c.Param("id")

@@ -15,7 +15,7 @@ const (
 	ErrorEmailInvalid = 1
 )
 
-func (h *Handler) GetUserHandler(c *gin.Context) {
+func (h *Handler) GetUser(c *gin.Context) {
 	var user models.User
 
 	userID := c.Param("id")
@@ -34,7 +34,7 @@ func (h *Handler) GetUserHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, user)
 }
-func (h *Handler) UsersHandler(c *gin.Context) {
+func (h *Handler) Users(c *gin.Context) {
 	// fecthar los datos de la base de datos
 	var users []models.User
 	// SELECT * FROM users;
@@ -48,7 +48,7 @@ func (h *Handler) UsersHandler(c *gin.Context) {
 		"users": users,
 	})
 }
-func (h *Handler) NewUserHandler(c *gin.Context) {
+func (h *Handler) NewUser(c *gin.Context) {
 	var newUser models.User
 	var errors []models.APIError
 
@@ -113,7 +113,7 @@ func (h *Handler) NewUserHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "JSON Recibido", "data": newUser.Email})
 }
 
-func (h *Handler) DeleteUserHandler(c *gin.Context) {
+func (h *Handler) DeleteUser(c *gin.Context) {
 	var user models.User
 
 	userID := c.Param("id")
